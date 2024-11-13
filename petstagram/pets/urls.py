@@ -1,6 +1,6 @@
 from django.urls import path, include
 
-from petstagram.pets.views import add_pet, show_pet_details, edit_pet, delete_pet, AddPetView, PetDetailsView, \
+from petstagram.pets.views import AddPetView, PetDetailsView, \
     PetEditView, PetDeleteView
 
 urlpatterns = (

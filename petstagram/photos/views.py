@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView
@@ -7,11 +8,19 @@ from petstagram.photos.forms import PhotoAddForm, PhotoEditForm
 from petstagram.photos.models import Photo
 
 
-class AddPhotoView(CreateView):
+class AddPhotoView(LoginRequiredMixin, CreateView):
     model = Photo
     form_class = PhotoAddForm
     template_name = 'photos/photo-add-page.html'
     success_url = reverse_lazy('show-home-page')
+
+    def form_valid(self, form):
+        photo = form.save(commit=False)
+        photo.user = self.request.user
+
+        # photo.save()
+        # form._save_m2m()
+        return super().form_valid(form)
 
 def add_photo(request):
     form = PhotoAddForm(request.POST or None, request.FILES or None)
@@ -26,7 +35,7 @@ def add_photo(request):
     return render(request, 'photos/photo-add-page.html', context)
 
 
-class PhotoDetailsView(DetailView):
+class PhotoDetailsView(LoginRequiredMixin, DetailView):
     model = Photo
     template_name = 'photos/photo-details-page.html'
 
@@ -36,6 +45,7 @@ class PhotoDetailsView(DetailView):
         context['likes'] = self.object.like_set.all()
         context['comments'] = self.object.comment_set.all()
         context['comment_form'] = CommentForm()
+        self.object.has_liked = self.object.like_set.filter(user=self.request.user).exists()
 
         return context
 
@@ -53,7 +63,7 @@ def view_photo_details(request, pk: int):
     return render(request, 'photos/photo-details-page.html', context)
 
 
-class PhotoEditView(UpdateView):
+class PhotoEditView(LoginRequiredMixin, UpdateView):
     model = Photo
     template_name = 'photos/photo-edit-page.html'
     form_class = PhotoEditForm

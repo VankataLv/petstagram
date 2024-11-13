@@ -7,16 +7,20 @@
             <a href="#">
                 <div class="profilepic">
                     <div class="profile_img">
+                        {% if photo.user.profile.profile_picture %}
+                            <img src="{{ photo.user.profile.profile_picture }}" alt="img8">
+                        {% else %}
                         <div class="image">
                             <img src="{% static 'images/person.png'%}" alt="img8">
                         </div>
+                        {% endif %}
                     </div>
                 </div>
             </a>
             <h3>
-                <a href="#">
+                <a href="{% url 'profile-details' photo.user.pk %}">
                     <!-- if user has first name and last name -->
-                    Diyan Kalaydzhiev
+                    {{ photo.user.profile.get_full_name }}
                     <!-- else -->
                     <!-- user username -->
                 </a>
@@ -26,7 +30,7 @@
                     <span>{{ photo.location }}</span>
                 {% endif %}
                 
-                {% if photo_page %}
+                {% if photo_page and request.user.pk == photo.user.pk %}
                 <div class="edit-delete-btns">
     
                     <!-- Link to Edit Pet Photo Page -->
@@ -58,7 +62,7 @@
             <div class="left">
                     <span class="heart">
                         <a href="{% url 'like' photo.pk %}">
-                          {% if photo.like_set.all %}
+                          {% if photo.has_liked %}
                               <i class="fa-solid fa-heart" style="color: #ed4040;"></i>
                            {% else %}
                                <i class="fa-regular fa-heart"></i>
@@ -79,7 +83,7 @@
 
         {% for pet in photo.tagged_pets.all %}
             <!-- Link to First Tagged Pet Details Page-->
-            <a href="{% url 'pet-details' "username" pet.slug %}">
+            <a href="{% url 'pet-details' photo.user.profile.get_full_name pet.slug %}">
                 <p class="message">
                     <b>{{ pet.name }}</b>
                 </p>

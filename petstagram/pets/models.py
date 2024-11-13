@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.template.defaultfilters import slugify
 
+
+UserModel = get_user_model()
 
 class Pet(models.Model):
     name = models.CharField(max_length=30)
@@ -12,6 +15,7 @@ class Pet(models.Model):
         blank=True,
         editable=False,
     )
+    user = models.ForeignKey(to=UserModel, on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs) #za da se zapazi id

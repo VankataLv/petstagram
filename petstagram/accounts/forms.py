@@ -20,4 +20,10 @@ class AppUserCreationForm(UserCreationForm):
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
-        exclude = ('user', )
+        fields = ('first_name', 'last_name', 'date_of_birth', 'profile_picture')
+        labels = {
+            'first_name': 'First name:',
+            'last_name': 'Last name:',
+            'date_of_birth': 'DoB (YYYY-MM-DD):',
+            'profile_picture': 'Profile pic:',
+        }

@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, DetailView, UpdateView, DeleteView
@@ -7,25 +8,23 @@ from petstagram.pets.forms import PetForm, PetDeleteForm
 from petstagram.pets.models import Pet
 
 
-class AddPetView(CreateView):
+class AddPetView(LoginRequiredMixin, CreateView):
     model = Pet
     # queryset = Pet.objects.all()
     form_class = PetForm
     template_name = 'pets/pet-add-page.html'
-    success_url = reverse_lazy('profile-details', kwargs={'pk': 1,})
 
-def add_pet(request):
-    form = PetForm(request.POST or None)
-    if form.is_valid():
-        form.save()
-        return redirect('profile-details', pk=1)
+    def form_valid(self, form):
+        pet = form.save(commit=False)
+        pet.user = self.request.user
+        # pet.save()
+        return super().form_valid(form)
 
-    context = {'form': form,}
-
-    return render(request, 'pets/pet-add-page.html', context)
+    def get_success_url(self):
+        return reverse_lazy('profile-details', kwargs={'pk': self.request.user.pk,})
 
 
-class PetDetailsView(DetailView):
+class PetDetailsView(LoginRequiredMixin, DetailView):
     model = Pet
     template_name = 'pets/pet-details-page.html'
     slug_url_kwarg = 'pet_slug'
@@ -49,7 +48,7 @@ def show_pet_details(request, username: str, pet_slug: str):
     return render(request, 'pets/pet-details-page.html', context)
 
 
-class PetEditView(UpdateView):
+class PetEditView(LoginRequiredMixin, UpdateView):
     model = Pet
     template_name = 'pets/pet-edit-page.html'
     slug_url_kwarg = 'pet_slug'
@@ -79,7 +78,7 @@ def edit_pet(request, username: str, pet_slug: str):
     return render(request, 'pets/pet-edit-page.html', context)
 
 
-class PetDeleteView(DeleteView):
+class PetDeleteView(LoginRequiredMixin, DeleteView):
     model = Pet
     template_name = 'pets/pet-delete-page.html'
     slug_url_kwarg = 'pet_slug'

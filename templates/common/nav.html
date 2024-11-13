@@ -4,7 +4,7 @@
     <div class="container">
         <div class="logo">
             <!-- Link to Home Page -->
-            <a href="#">
+            <a href="{% url 'show-home-page' %}">
                 <img width="50px" src="{% static 'images/free-30-instagram-stories-icons23_122570.png' %}"
                      alt="img1">
             </a>
@@ -52,11 +52,11 @@
                         <i>Profile</i>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a href="#">
-                        <i>Logout</i>
-                    </a>
-                </li>
+
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button class="button"><i>Logout</i></button>
+                </form>
             </ul>
         </div>
     </div>
